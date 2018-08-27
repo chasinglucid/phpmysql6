@@ -1,10 +1,20 @@
 <?php
-  $title = 'Internet Joke Database';
+
+try {
+  include __DIR__ . '/../classes/EntryPoint.php';
+
+  $route = ltrim(strtok($_SERVER['REQUEST_URI'], '?'), '/');
   
-  ob_start();
+  $entryPoint = new EntryPoint($route);
+  $entryPoint->run();
+
+   
+}
+catch (PDOException $e) {
+  $title = 'An error has occurred';
+  $output = 'Database error: ' . $e->getMessage() . ' in ' .
+    $e->getFile() . ':' . $e->getLine();
   
-  include __DIR__ . '/../templates/home.html.php';
-  
-  $output = ob_get_clean();
-    
-  include __DIR__ . '/../templates/layout.html.php';
+  include  __DIR__ . '/../templates/layout.html.php'; 
+
+}
