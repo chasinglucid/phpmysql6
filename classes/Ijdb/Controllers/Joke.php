@@ -1,6 +1,9 @@
 <?php
 
-class JokeController {
+namespace Ijdb\Controllers;
+use \Ninja\DatabaseTable;
+
+class Joke {
   
   // variables
   private $authorsTable;
