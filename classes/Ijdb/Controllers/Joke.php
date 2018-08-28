@@ -1,41 +1,39 @@
 <?php
-
 namespace Ijdb\Controllers;
 use \Ninja\DatabaseTable;
-use \Ninja\Authenticaion;
+use \Ninja\Authentication;
 
 class Joke {
+	private $authorsTable;
+	private $jokesTable;
 
-  // variables
-  private $authorsTable;
-  private $jokesTable;
+	public function __construct(DatabaseTable $jokesTable, DatabaseTable $authorsTable, Authentication $authentication) {
+		$this->jokesTable = $jokesTable;
+		$this->authorsTable = $authorsTable;
+		$this->authentication = $authentication;
+	}
 
-  // constructor
-  public function __construct(DatabaseTable $jokesTable, DatabaseTable $authorsTable, Authentication $authentication) {
-    $this->jokesTable = $jokesTable;
-    $this->authorsTable = $authorsTable;
-    $this->authentication = $authentication;
-  }
+	public function list() {
+		$result = $this->jokesTable->findAll();
 
-  public function list() {
-    $result = $this->jokesTable->findAll();
-
-    $jokes = [];
-    foreach ($result as $joke) {
+		$jokes = [];
+		foreach ($result as $joke) {
 			$author = $this->authorsTable->findById($joke['authorId']);
 
-      $jokes[] = [
-        'id' => $joke['id'],
-        'joketext' => $joke['joketext'],
-        'jokedate' => $joke['jokedate'],
-        'name' => $author['name'],
-        'email' => $author['email']
-      ];
-    }
+			$jokes[] = [
+				'id' => $joke['id'],
+				'joketext' => $joke['joketext'],
+				'jokedate' => $joke['jokedate'],
+				'name' => $author['name'],
+				'email' => $author['email']
+			];
 
-    $title = 'Joke list';
+		}
 
-    $totalJokes = $this->jokesTable->total();
+
+		$title = 'Joke list';
+
+		$totalJokes = $this->jokesTable->total();
 
 		ob_start();
 
@@ -50,44 +48,38 @@ class Joke {
 						'jokes' => $jokes
 					]
 				];
-  }
+	}
 
-  public function home() {
+	public function home() {
+		$title = 'Internet Joke Database';
 
-    $title = 'Internet Joke Database';
+		return ['template' => 'home.html.php', 'title' => $title];
+	}
 
-    return ['template' => 'home.html.php', 'title' =>  $title];
-  }
+	public function delete() {
+		$this->jokesTable->delete($_POST['id']);
 
-  public function delete() {
+		header('location: /joke/list'); 
+	}
 
-    $this->jokesTable->delete($_POST['id']);
+	public function saveEdit() {
+		$author = $this->authentication->getUser();
 
-    header('location: /joke/list');
+		$joke = $_POST['joke'];
+		$joke['jokedate'] = new \DateTime();
+		$joke['authorId'] = $author['id'];
 
-  }
+		$this->jokesTable->save($joke);
+		
+		header('location: /joke/list'); 
+	}
 
+	public function edit() {
+		if (isset($_GET['id'])) {
+			$joke = $this->jokesTable->findById($_GET['id']);
+		}
 
-  public function saveEdit() {
-    $author = $this->authentication-getUser();
-        
-    $joke = $_POST['joke'];
-    $joke['jokedate'] = new \DateTime();
-    $joke['authorId'] = $author['id'];
-
-    $this->jokesTable->save($joke);
-
-    header('location: /joke/list');    
-
-  }
-  public function edit() {
-
-    if (isset($_GET['id'])) {
-
-      $joke = $this->jokesTable->findById($_GET['id']);
-    }
-
-    $title = 'Edit joke';
+		$title = 'Edit joke';
 
 		return ['template' => 'editjoke.html.php',
 				'title' => $title,
@@ -95,6 +87,6 @@ class Joke {
 						'joke' => $joke ?? null
 					]
 				];
-}
-
+	}
+	
 }

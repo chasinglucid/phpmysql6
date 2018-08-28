@@ -29,14 +29,13 @@ class Login {
 	public function success() {
 		return ['template' => 'loginsuccess.html.php', 'title' => 'Login Successful'];
 	}
-  
-  public function logout() {
-    session_destroy();
-    return['template' => 'logout.html.php',
-          'title' => 'You have been logged out'];
-  }
 
 	public function error() {
 		return ['template' => 'loginerror.html.php', 'title' => 'You are not logged in'];
+	}
+
+	public function logout() {
+		unset($_SESSION);
+		return ['template' => 'logout.html.php', 'title' => 'You have been logged out'];
 	}
 }
