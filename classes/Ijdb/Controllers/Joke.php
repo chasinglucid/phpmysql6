@@ -20,7 +20,7 @@ class Joke {
 
     $jokes = [];
     foreach ($result as $joke) {
-      $author = $this->authorsTable->findById($joke['authorid']);
+			$author = $this->authorsTable->findById($joke['authorId']);
 
       $jokes[] = [
         'id' => $joke['id'],
@@ -35,7 +35,19 @@ class Joke {
 
     $totalJokes = $this->jokesTable->total();
 
-    return ['template' => 'jokes.html.php', 'title' => $title, 'variables'=> ['totalJokes' => $totalJokes, 'jokes' => $jokes]];
+		ob_start();
+
+		include  __DIR__ . '/../../templates/';
+
+		$output = ob_get_clean();
+
+		return ['template' => 'jokes.html.php', 
+				'title' => $title, 
+				'variables' => [
+						'totalJokes' => $totalJokes,
+						'jokes' => $jokes
+					]
+				];
   }
 
   public function home() {
@@ -72,6 +84,12 @@ class Joke {
 
     $title = 'Edit joke';
 
-    return ['template' => 'editjoke.html.php', 'title' => $title, 'variables' => ['joke' => $joke ?? null]];      
-  }
+		return ['template' => 'editjoke.html.php',
+				'title' => $title,
+				'variables' => [
+						'joke' => $joke ?? null
+					]
+				];
+}
+
 }

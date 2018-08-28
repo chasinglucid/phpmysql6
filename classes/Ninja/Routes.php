@@ -8,5 +8,6 @@ namespace Ninja;
 // allows each website to supply a different set of routes
 interface Routes
 {
-  public function getRoutes();
+  public function getRoutes(): array;
+  public function getAuthentication(): \Ninja\Authentication;
 }

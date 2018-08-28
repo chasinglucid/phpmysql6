@@ -13,8 +13,8 @@ class EntryPoint {
   public function __construct(string $route, string $method, \Ninja\Routes $routes)
   {
     $this->route = $route;
-    $this->method = $method;
     $this->routes = $routes;
+		$this->method = $method;
     $this->checkUrl();
   }
 
@@ -39,31 +39,37 @@ class EntryPoint {
 
     // get array of routes from IjdbRoutes.php
     $routes = $this->routes->getRoutes();
-    
-    // get the associated controller from the routes array 
-    // (link/methond[GET|POST]/controller)
-    $controller = $routes[$this->route][$this->method]['controller'];
-    
-    // get the assiciated action from the routes array
-    // (link/method[GET|POST]/Controller)
-    $action = $routes[$this->route][$this->method]['action'];
 
-    // set page based on the determined controller and the
-    // determined action (ie. JokeController->delete())
-    $page = $controller->$action();
+    $authentication = $this->routes->getAuthentication();
 
-    // set page title
-    $title = $page['title'];
+    if (isset($routes[$this->route]['login']) && isset($routes[$this->route]['login']) && !$authentication->isLoggedIn()) {
+      header('location: /login/error');
+    } else {
+      // get the associated controller from the routes array 
+      // (link/methond[GET|POST]/controller)
+      $controller = $routes[$this->route][$this->method]['controller'];
 
-    // if the page has variables, output them using loadTemplate
-    if (isset($page['variables'])) {
-      $output = $this->loadTemplate($page['template'], $page['variables']);
+      // get the assiciated action from the routes array
+      // (link/method[GET|POST]/Controller)
+      $action = $routes[$this->route][$this->method]['action'];
+
+      // set page based on the determined controller and the
+      // determined action (ie. JokeController->delete())
+      $page = $controller->$action();
+
+      // set page title
+      $title = $page['title'];
+
+      // if the page has variables, output them using loadTemplate
+      if (isset($page['variables'])) {
+        $output = $this->loadTemplate($page['template'], $page['variables']);
+      }
+      else { // otherwise just load the template
+        $output = $this->loadTemplate($page['template']);
+      }
+
+      // output to common template
+      include  __DIR__ . '/../../templates/layout.html.php'; 
     }
-    else { // otherwise just load the template
-      $output = $this->loadTemplate($page['template']);
-    }
-
-    // output to common template
-    include  __DIR__ . '/../../templates/layout.html.php'; 
   }
 }
