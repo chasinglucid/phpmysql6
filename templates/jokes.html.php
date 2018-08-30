@@ -19,7 +19,7 @@ echo $date->format('jS F Y');
 <?php if ($userId == $joke->authorId): ?>
   <a href="/joke/edit?id=<?=$joke->id?>">Edit</a>
   <form action="/joke/delete" method="post">
-    <input type="hidden" name="id" value="<?=$joke->id ?>">
+    <input type="hidden" name="id" value="<?=$joke->id?>">
     <input type="submit" value="Delete">
   </form>
 <?php endif; ?>
