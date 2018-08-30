@@ -8,6 +8,10 @@ class Author {
 	public $password;
 	private $jokesTable;
 
+    
+  // constructor asks for an instance of a DatabaseTable class
+  // that contains related data
+  // in this case the joke database table
 	public function __construct(\Ninja\DatabaseTable $jokeTable) {
 		$this->jokesTable = $jokeTable;
 	}
