@@ -5,25 +5,29 @@ class IjdbRoutes implements \Ninja\Routes {
   private $authorsTable;
   private $jokesTable;
   private $categoriesTable;
+  private $jokeCategoriesTable;
   private $authentication;
 
   public function __construct() {
     include __DIR__ . '/../../includes/DatabaseConnection.php';
 
+    // & is an instance placeholder
     $this->jokesTable = new \Ninja\DatabaseTable($pdo, 'joke', 'id', 
                                                  '\Ijdb\Entity\Joke', 
-                                                 [&$this->authorsTable]);
+                                                 [&$this->authorsTable, 
+                                                  &$this->jokeCategoriesTable]);
     $this->authorsTable = new \Ninja\DatabaseTable($pdo, 'author', 'id', 
                                                    '\Ijdb\Entity\Author', 
                                                    [&$this->jokesTable]);
     $this->categoriesTable = new \Ninja\DatabaseTable($pdo,'category', 'id');
+    $this->jokeCategoriesTable = new \Ninja\DatabaseTable($pdo, 'joke_category', 'categoryId');
     $this->authentication = new \Ninja\Authentication($this->authorsTable, 'email', 'password');
   }
 
   public function getRoutes(): array {
     $jokeController = new \Ijdb\Controllers\Joke($this->jokesTable, 
                                                  $this->authorsTable, 
-                                                 $his->categoriesTable, 
+                                                 $this->categoriesTable, 
                                                  $this->authentication);
     $authorController = new \Ijdb\Controllers\Register($this->authorsTable);
     $loginController = new \Ijdb\Controllers\Login($this->authentication);
