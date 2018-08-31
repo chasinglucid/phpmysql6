@@ -11,53 +11,21 @@ class IjdbRoutes implements \Ninja\Routes {
   public function __construct() {
     include __DIR__ . '/../../includes/DatabaseConnection.php';
 
-    // & is an instance placeholder
-    $this->jokesTable = new \Ninja\DatabaseTable($pdo, 'joke', 'id', 
-                                                 '\Ijdb\Entity\Joke', 
-                                                 [&$this->authorsTable, 
-                                                  &$this->jokeCategoriesTable]);
-    $this->authorsTable = new \Ninja\DatabaseTable($pdo, 'author', 'id', 
-                                                   '\Ijdb\Entity\Author', 
-                                                   [&$this->jokesTable]);
-    $this->categoriesTable = new \Ninja\DatabaseTable($pdo,'category', 'id');
+    $this->jokesTable = new \Ninja\DatabaseTable($pdo, 'joke', 'id', '\Ijdb\Entity\Joke', [&$this->authorsTable, &$this->jokeCategoriesTable]);
+    $this->authorsTable = new \Ninja\DatabaseTable($pdo, 'author', 'id', '\Ijdb\Entity\Author', [&$this->jokesTable]);
+    $this->categoriesTable = new \Ninja\DatabaseTable($pdo,'category', 'id', '\Ijdb\Entity\Category',[&$this->jokesTable,&$this->jokeCategoriesTable]);
     $this->jokeCategoriesTable = new \Ninja\DatabaseTable($pdo, 'joke_category', 'categoryId');
     $this->authentication = new \Ninja\Authentication($this->authorsTable, 'email', 'password');
   }
 
   public function getRoutes(): array {
-    $jokeController = new \Ijdb\Controllers\Joke($this->jokesTable, 
-                                                 $this->authorsTable, 
-                                                 $this->categoriesTable, 
-                                                 $this->authentication);
+    $jokeController = new \Ijdb\Controllers\Joke($this->jokesTable, $this->authorsTable, $this->categoriesTable, $this->authentication);
     $authorController = new \Ijdb\Controllers\Register($this->authorsTable);
     $loginController = new \Ijdb\Controllers\Login($this->authentication);
     $categoryController = new \Ijdb\Controllers\Category($this->categoriesTable);
 
     $routes = [
-      'category/delete' => [
-        'POST' => [
-          'controller' => $categoryController,
-          'action' => 'delete'
-        ],
-        'login' => true
-      ],
-      'category/list' => [
-        'GET' => [
-          'controller' => $categoryController,
-          'action' => 'list'
-        ],
-        'login' => true
-      ],'category/edit' => [
-        'POST' => [
-          'controller' => $categoryController,
-          'action' => 'saveEdit'
-        ],
-        'GET' => [
-          'controller' => $categoryController,
-          'action' => 'edit'
-        ],
-        'login' => true
-      ],'author/register' => [
+      'author/register' => [
         'GET' => [
           'controller' => $authorController,
           'action' => 'registrationForm'
@@ -83,7 +51,6 @@ class IjdbRoutes implements \Ninja\Routes {
           'action' => 'edit'
         ],
         'login' => true
-
       ],
       'joke/delete' => [
         'POST' => [
@@ -125,6 +92,31 @@ class IjdbRoutes implements \Ninja\Routes {
           'controller' => $loginController,
           'action' => 'processLogin'
         ]
+      ],
+      'category/edit' => [
+        'POST' => [
+          'controller' => $categoryController,
+          'action' => 'saveEdit'
+        ],
+        'GET' => [
+          'controller' => $categoryController,
+          'action' => 'edit'
+        ],
+        'login' => true
+      ],
+      'category/delete' => [
+        'POST' => [
+          'controller' => $categoryController,
+          'action' => 'delete'
+        ],
+        'login' => true
+      ],
+      'category/list' => [
+        'GET' => [
+          'controller' => $categoryController,
+          'action' => 'list'
+        ],
+        'login' => true
       ],
       '' => [
         'GET' => [

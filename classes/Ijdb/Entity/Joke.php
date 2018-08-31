@@ -2,35 +2,30 @@
 namespace Ijdb\Entity;
 
 class Joke {
-  public $id;
-  public $authorId;
-  public $jokedate;
-  public $joketext;
-  private $authorsTable;
-  private $author;
-  private $jokeCategoriesTable;
+	public $id;
+	public $authorId;
+	public $jokedate;
+	public $joketext;
+	private $authorsTable;
+	private $author;
+	private $jokeCategoriesTable;
 
-  public function __construct(\Ninja\DatabaseTable $authorsTable,
-                              \Ninja\DatabaseTable $jokeCategoriesTable) {
-    $this->authorsTable = $authorsTable;
-    $this->jokeCategoriesTable = $jokeCategoriesTable;
-  }
+	public function __construct(\Ninja\DatabaseTable $authorsTable, \Ninja\DatabaseTable $jokeCategoriesTable) {
+		$this->authorsTable = $authorsTable;
+		$this->jokeCategoriesTable = $jokeCategoriesTable;
+	}
 
-  public function getAuthor() {
+	public function getAuthor() {
+		if (empty($this->author)) {
+			$this->author = $this->authorsTable->findById($this->authorId);
+		}
+		
+		return $this->author;
+	}
 
-    if (empty($this->author)) {
-      $this->author = $this->authorsTable->findById($this->authorId);
-    }
-    return $this->author;
-  }
+	public function addCategory($categoryId) {
+		$jokeCat = ['jokeId' => $this->id, 'categoryId' => $categoryId];
 
-  public function addCategory($ccategoryId){
-    
-    // create an array that represents the record
-    // to be added
-    $jokeCat = ['jokeId' => $this->id,
-                'categoryId' => $categoryId];
-
-    $this->jokeCategoriesTable->save*$jokeCat);
-  }
+		$this->jokeCategoriesTable->save($jokeCat);
+	}
 }

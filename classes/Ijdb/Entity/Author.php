@@ -16,10 +16,7 @@ class Author {
 		return $this->jokesTable->find('authorId', $this->id);
 	}
 
-  // save the joke to the author and return the resulting 
-  // joke instance
 	public function addJoke($joke) {
-
 		$joke['authorId'] = $this->id;
 
 		return $this->jokesTable->save($joke);

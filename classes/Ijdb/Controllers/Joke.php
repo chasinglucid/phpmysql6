@@ -9,10 +9,7 @@ class Joke {
   private $categoriesTable;
   private $authentication;
 
-  public function __construct(DatabaseTable $jokesTable, 
-                              DatabaseTable $authorsTable, 
-                              DatabaseTable $categoriesTable,
-                              Authentication $authentication) {
+  public function __construct(DatabaseTable $jokesTable, DatabaseTable $authorsTable, DatabaseTable $categoriesTable, Authentication $authentication) {
     $this->jokesTable = $jokesTable;
     $this->authorsTable = $authorsTable;
     $this->categoriesTable = $categoriesTable;
@@ -20,7 +17,15 @@ class Joke {
   }
 
   public function list() {
-    $jokes = $this->jokesTable->findAll();
+    if (isset($_GET['category']))
+    {
+      $category = $this->categoriesTable->findById($_GET['category']);
+      $jokes = $category->getJokes();
+    }
+    else
+    {
+      $jokes = $this->jokesTable->findAll();  
+    }	
 
     $title = 'Joke list';
 
@@ -33,7 +38,8 @@ class Joke {
             'variables' => [
               'totalJokes' => $totalJokes,
               'jokes' => $jokes,
-              'userId' => $author->id ?? null
+              'userId' => $author->id ?? null,
+              'categories' =>$this->categoriesTable->findAll()
             ]
            ];
   }
@@ -67,10 +73,8 @@ class Joke {
     $joke['jokedate'] = new \DateTime();
 
     $jokeEntity = $author->addJoke($joke);
-    
-    foreach($_POST['category'] as $categoryId) {
-      
-      // assign category to joke just added to db
+
+    foreach ($_POST['category'] as $categoryId) {
       $jokeEntity->addCategory($categoryId);
     }
 
@@ -80,7 +84,6 @@ class Joke {
   public function edit() {
     $author = $this->authentication->getUser();
     $categories = $this->categoriesTable->findAll();
-
 
     if (isset($_GET['id'])) {
       $joke = $this->jokesTable->findById($_GET['id']);
