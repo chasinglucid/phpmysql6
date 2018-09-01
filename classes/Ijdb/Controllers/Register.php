@@ -103,4 +103,15 @@ class Register {
             ]
            ];
   }
+
+  public function savePermissions() {
+    $author = [
+      'id' => $_GET['id'],
+      'permissions' => array_sum($_POST['permissions'] ?? [])
+    ];
+
+    $this->authorsTable->save($author);
+
+    header('location: /author/list');
+  }
 }
