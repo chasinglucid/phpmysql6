@@ -138,7 +138,7 @@ class IjdbRoutes implements \Ninja\Routes {
 					'action' => 'list'
 				],
 				'login' => true,
-				'permissions' => \Ijdb\Entity\Author::EDIT_CATEGORIES
+				'permissions' => \Ijdb\Entity\Author::LIST_CATEGORIES
 			],
 			'' => [
 				'GET' => [
